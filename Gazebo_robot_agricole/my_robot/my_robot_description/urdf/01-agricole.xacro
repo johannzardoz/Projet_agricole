@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+    <!--Creation du modele du robot agricole-->  
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_robot">
+    <!--Proprietes de la camera-->  
+    <xacro:property name="cameraSize" value="0.005"/>
+    <xacro:property name="cameraMass" value="0.1"/>
+    <!--Proprietes du batit du robot-->  
+    <xacro:property name="body_length" value="0.546" />
+    <xacro:property name="body_width" value="0.926" />
+    <xacro:property name="body_height" value="0.180" />
+    <!--Proprietes des roues-->  
+    <xacro:property name="wheel_width" value="0.045" />
+    <xacro:property name="wheel_radius" value="0.100" />
+    <xacro:property name="wheel_mass" value="2"/>
+    <!--Masse du robot-->  
+    <xacro:property name="body_mass" value="10"/>
+    <!--Decalage des origines par rapport au fichier STL-->  
+    <xacro:property name="decalage_x" value="0.273" />
+    <xacro:property name="decalage_y" value="0.510" />
+    <xacro:property name="decalage_z" value="0.181585" />
+
+    <!--Creation des roues-->  
+    <xacro:macro name="create_wheel" params="position"> 
+    
+        <link name="${position}_wheel">
+                <visual>
+                    <xacro:if value="${position=='fl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" /> 
+                    </xacro:if>
+
+                    <xacro:if value="${position=='fr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <geometry>
+                        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                    </geometry>
+                    <material name="blue"/>
+                </visual>
+
+    <!--Gestion de la collision des roues-->  
+		<collision>
+                    <xacro:if value="${position=='fl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" /> 
+                    </xacro:if>
+
+                    <xacro:if value="${position=='fr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <geometry>
+                        <cylinder radius="${wheel_radius}" length="${wheel_width}"/> 
+	            </geometry>
+
+		</collision>
+
+    <!--Gestion de l'inertie des roues-->  
+            <xacro:cylinder_inertial mass="${wheel_mass}" r="${wheel_radius}" h="${wheel_width}"/>
+            </link> 
+    <!--Creation de la liaison entre le batit et les roues-->  
+            <joint name="${position}_wheel_joint" type="continuous">
+                <xacro:if value="${position=='fl'}">
+                    <origin xyz="${0.1965} ${0.510-wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if>
+
+                <xacro:if value="${position=='fr'}">
+                    <origin xyz="${0.1965} ${-0.510+wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if> 
+
+                <xacro:if value="${position=='rl'}">
+                    <origin xyz="${-0.175} ${0.510-wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if>
+
+                <xacro:if value="${position=='rr'}">
+                    <origin xyz="${-0.175} ${-0.510+wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if>
+
+                <parent link="base_link"/>
+                <child link="${position}_wheel"/> 
+                <axis xyz="0.0 1.0 0.0" />
+            </joint>
+    </xacro:macro> 
+
+    <!--Creation des matrices d'inerties des formes simples-->  
+    <xacro:macro name="box_inertial" params="mass l w h">
+        <inertial>
+                <mass value="${mass}" />
+                <inertia ixx="${mass/3*(w*w + h*h)}" ixy="${mass/4*l*w}" ixz="${mass/4*l*h}"
+                     iyy="${mass/3*(l*l + h*h)}" iyz="${mass/4*w*h}"
+                     izz="${mass/3*(l*l + w*w)}" />
+        </inertial>
+    </xacro:macro>
+    <xacro:macro name="cylinder_inertial" params="mass r h">
+        <inertial>
+                <mass value="${mass}" />
+                <inertia ixx="${mass/12*(3*r*r + h*h)}" ixy="0.0" ixz="0.0"
+                     iyy="${mass/12*(3*r*r + h*h)}" iyz="0.0"
+                     izz="${mass/2*(r*r)}" />
+        </inertial>
+    </xacro:macro>
+    <xacro:macro name="spherus_inertial" params="mass r">
+        <inertial>
+                <mass value="${mass}" />
+                <inertia ixx="${mass/5*2*(r*r)}" ixy="0.0" ixz="0.0"
+                     iyy="${mass/5*2*(r*r)}" iyz="0.0"
+                     izz="${mass/5*2*(r*r)}" />
+        </inertial>
+    </xacro:macro>
+
+    <!--Creation du batit du robot-->
+    <link name="base_link">
+        <visual>
+            <origin xyz="${-decalage_x} ${decalage_y} ${-decalage_z}" rpy="${pi/2} 0 0"/>
+            <geometry>
+                <mesh filename="package://my_robot_description/meshes/robot_agricole.STL" scale="1 1 1"/>
+            </geometry> 
+        </visual>
+    <xacro:box_inertial mass="${body_mass}" l="${body_length}" w="${body_width}" h="${body_height}"/>
+    </link>
+    <!--Appel de la fonction de creation des roues-->
+    <xacro:create_wheel position="fl"/>
+    <xacro:create_wheel position="fr"/>
+    <xacro:create_wheel position="rl"/>
+    <xacro:create_wheel position="rr"/>
+
+    <!--Creation et positionnement de la camera-->
+    <link name="camera">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+
+      <inertial>
+        <mass value="${cameraMass}" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <box_inertia m="${cameraMass}" x="${cameraSize}" y="${cameraSize}" z="${cameraSize}" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <!--Liaison entre la camera et le batit du robot-->
+    <joint name="camera_joint" type="fixed">
+      <axis xyz="0 1 0" />
+      <origin xyz="0.333 0 0.04061" rpy="0 ${pi/2} 0"/>
+      <parent link="base_link"/>
+      <child link="camera"/>
+    </joint>
+    <!--Creation et positionnement de l'imu-->
+    <link name="imu">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.02 0.02 0.02"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+
+      <inertial>
+        <mass value="${cameraMass}" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <box_inertia m="${cameraMass}" x="0.02" y="0.02" z="0.02" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+    <!--Liaison entre l'imu et le batit du robot-->
+    <joint name="imu_joint" type="fixed">
+      <axis xyz="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="imu"/>
+    </joint>
+</robot> 

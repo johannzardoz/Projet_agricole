@@ -1,0 +1,7 @@
+<launch>
+	<arg name="model" default="$(find my_robot_description)/urdf/00-agricole.xacro"/>
+
+	<rosparam command="load" file="$(find my_robot_control)/config/joints.yaml"/> 
+	<rosparam command="load" file="$(find my_robot_control)/config/diff_drive.yaml"/>
+	<node name="my_robot_controller_spawner" pkg="controller_manager" type="spawner" ns="/" args="my_robot_state_controller my_robot_velocity_controller"/>
+</launch>

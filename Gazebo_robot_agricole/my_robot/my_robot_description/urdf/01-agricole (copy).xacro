@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="my_robot">
+    <xacro:property name="cameraSize" value="0.05"/>
+    <xacro:property name="cameraMass" value="0.1"/>
+
+    <xacro:property name="body_length" value="0.546" />
+    <xacro:property name="body_width" value="0.926" />
+    <xacro:property name="body_height" value="0.180" />
+    <xacro:property name="wheel_width" value="0.045" />
+    <xacro:property name="wheel_radius" value="0.100" />
+    <xacro:property name="wheel_mass" value="2"/>
+    <xacro:property name="body_mass" value="10"/>
+
+    <!--DEFINITION DE MACRO-->  
+    <xacro:macro name="create_wheel" params="position"> 
+    
+        <link name="${position}_wheel">
+                <visual>
+                    <xacro:if value="${position=='fl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" /> 
+                    </xacro:if>
+
+                    <xacro:if value="${position=='fr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <geometry>
+                        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                    </geometry>
+                </visual>
+
+		<collision>
+                    <xacro:if value="${position=='fl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" /> 
+                    </xacro:if>
+
+                    <xacro:if value="${position=='fr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rl'}">
+                        <origin xyz="0.0 ${wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <xacro:if value="${position=='rr'}">
+                        <origin xyz="0.0 ${-wheel_width/2} 0.0" rpy="${pi/2} 0.0 0.0" />
+                    </xacro:if>
+
+                    <geometry>
+                        <cylinder radius="${wheel_radius}" length="${wheel_width}"/> 
+	            </geometry>
+		</collision>
+
+            <xacro:cylinder_inertial mass="${wheel_mass}" r="${wheel_radius}" h="${wheel_width}"/>
+            </link> 
+
+            <joint name="${position}_wheel_joint" type="continuous">
+                <xacro:if value="${position=='fl'}">
+                    <origin xyz="${0.1965} ${0.510-wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if>
+
+                <xacro:if value="${position=='fr'}">
+                    <origin xyz="${0.1965} ${-0.510+wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if> 
+
+                <xacro:if value="${position=='rl'}">
+                    <origin xyz="${-0.175} ${0.510-wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if>
+
+                <xacro:if value="${position=='rr'}">
+                    <origin xyz="${-0.175} ${-0.510+wheel_width/2} ${-body_height/2-0.057}" /> 
+                </xacro:if>
+
+                <!--origin xyz="0.4 ${body_width/2} 0.0"-->
+                <!--xacro:set_bl_as_parent_link-->  
+                <parent link="base_link"/>
+                <child link="${position}_wheel"/> 
+                <axis xyz="0.0 1.0 0.0" />
+            </joint>
+    </xacro:macro> 
+
+        <!-- MACROS -->
+    <xacro:macro name="box_inertial" params="mass l w h">
+        <inertial>
+                <mass value="${mass}" />
+                <inertia ixx="${mass/3*(w*w + h*h)}" ixy="${mass/4*l*w}" ixz="${mass/4*l*h}"
+                     iyy="${mass/3*(l*l + h*h)}" iyz="${mass/4*w*h}"
+                     izz="${mass/3*(l*l + w*w)}" />
+        </inertial>
+    </xacro:macro>
+    <xacro:macro name="cylinder_inertial" params="mass r h">
+        <inertial>
+                <mass value="${mass}" />
+                <inertia ixx="${mass/12*(3*r*r + h*h)}" ixy="0.0" ixz="0.0"
+                     iyy="${mass/12*(3*r*r + h*h)}" iyz="0.0"
+                     izz="${mass/2*(r*r)}" />
+        </inertial>
+    </xacro:macro>
+    <xacro:macro name="spherus_inertial" params="mass r">
+        <inertial>
+                <mass value="${mass}" />
+                <inertia ixx="${mass/5*2*(r*r)}" ixy="0.0" ixz="0.0"
+                     iyy="${mass/5*2*(r*r)}" iyz="0.0"
+                     izz="${mass/5*2*(r*r)}" />
+        </inertial>
+    </xacro:macro>
+    <!-- ____________________________________________ -->
+
+    <!--SECTION PRINCIPALE-->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${body_length} ${body_width} ${body_height}" /> 
+            </geometry> 
+        </visual>
+    <xacro:box_inertial mass="${body_mass}" l="${body_length}" w="${body_width}" h="${body_height}"/>
+    </link> 
+    <xacro:create_wheel position="fl"/>
+    <xacro:create_wheel position="fr"/>
+    <xacro:create_wheel position="rl"/>
+    <xacro:create_wheel position="rr"/>
+
+    <link name="camera1">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+
+      <inertial>
+        <mass value="${cameraMass}" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <box_inertia m="${cameraMass}" x="${cameraSize}" y="${cameraSize}" z="${cameraSize}" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <joint name="camera1_joint" type="fixed">
+      <axis xyz="0 1 0" />
+      <origin xyz="0.333 0 0.04061" rpy="0 ${pi/2} 0"/>
+      <parent link="base_link"/>
+      <child link="camera1"/>
+    </joint>
+
+    <link name="imu">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.02 0.02 0.02"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin xyz="0 0 0.2" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.02 0.02 0.02"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+
+      <inertial>
+        <mass value="${cameraMass}" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <box_inertia m="${cameraMass}" x="0.02" y="0.02" z="0.02" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <joint name="imu_joint" type="fixed">
+      <axis xyz="0 0 0" />
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="imu"/>
+    </joint>
+ <!--
+    <link name="camera_2">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+
+      <inertial>
+        <mass value="${cameraMass}" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <box_inertia m="${cameraMass}" x="${cameraSize}" y="${cameraSize}" z="${cameraSize}" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <joint name="camera_2_joint" type="fixed">
+      <axis xyz="0 1 0" />
+      <origin xyz="0 0.503 0" rpy="0 0 ${pi/2}"/>
+      <parent link="base_link"/>
+      <child link="camera_2"/>
+    </joint>
+ -->
+</robot> 

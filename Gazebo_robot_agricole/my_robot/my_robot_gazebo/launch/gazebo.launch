@@ -1,0 +1,15 @@
+<launch>
+	<arg name="headless" default="false" />
+	<arg name="debug" default="false" />
+	<arg name="model" default="$(find my_robot_description)/urdf/01-agricole.xacro"/>
+	<arg name="rvizconfig" default="$(find my_robot_description)/rviz/urdf.rviz" />
+
+	<include file="$(find my_robot_gazebo)/launch/world.launch">
+	</include>
+
+	<param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" args="-z 0.247 -urdf -model robot -param robot_description" respawn="false" output="screen"/>
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+		<param name="publish_frequency" type="double" value="50"/>
+	</node>
+</launch>

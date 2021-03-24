@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot name="my_robot">
+	<link name="base_link">
+		<visual>
+			<geometry>
+				<box size="1.0 0.5 0.2"/>
+			</geometry>
+		</visual>
+	</link>	
+    <link name="left_wheel">
+		<visual>
+            <origin xyz="0.0 0.075 0.0" rpy="-1.57 0.0 0.0"/>
+			<geometry>
+				<cylinder radius="0.15" length="0.15"/> 
+			</geometry>
+		</visual>
+	</link>	
+    <joint name="left_wheel_joint" type="fixed">
+        <origin xyz="0.4 0.25 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child link="left_wheel"/>
+    </joint>
+</robot>
